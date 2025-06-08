@@ -1,6 +1,7 @@
 mod models;
 
 use axum::{Router, routing::get};
+use chrono::NaiveDateTime;
 use dotenv::dotenv;
 use models::Article;
 use sqlx::Error;
@@ -37,6 +38,11 @@ async fn main() -> Result<(), Error> {
         println!("Database connection is dead.");
     }
 
+    let articles: Vec<Article> = get_all_articles(&pool).await?;
+    for article in articles {
+        println!("{}", article.title);
+    }
+
     // Build the Axum app
     let app = Router::new().route("/", get("Hello World!"));
 
@@ -45,6 +51,16 @@ async fn main() -> Result<(), Error> {
     axum::serve(listener, app).await?;
 
     Ok(())
+}
+
+async fn get_all_articles(pool: &PgPool) -> Result<Vec<Article>, sqlx::Error> {
+    let articles = sqlx::query_as::<_, Article>(
+        "SELECT id, title, url, source_id, published_at, content, summary, rating, processed, created_at FROM articles.arts"
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(articles)
 }
 
 // TODO: get all articles from db and turn into article structs

@@ -1,5 +1,8 @@
+mod models;
+
 use axum::{Router, routing::get};
 use dotenv::dotenv;
+use models::Article;
 use sqlx::Error;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
@@ -43,3 +46,7 @@ async fn main() -> Result<(), Error> {
 
     Ok(())
 }
+
+// TODO: get all articles from db and turn into article structs
+// TODO: turn all articles into json
+// TODO: send over api/articles/ or something similar
